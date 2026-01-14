@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>局域网文件传输</title>
+    <title>跨设备文件传输</title>
     <style>
         * {
             margin: 0;
@@ -115,42 +115,6 @@
         .btn-danger {
             background: #dc3545;
             color: white;
-        }
-
-        .device-list {
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .device-item {
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
-        }
-
-        .device-item:hover {
-            border-color: #667eea;
-            transform: translateX(5px);
-        }
-
-        .device-item.active {
-            border-color: #667eea;
-            background: #f0f4ff;
-        }
-
-        .device-name {
-            font-weight: 600;
-            color: #212529;
-            margin-bottom: 5px;
-        }
-
-        .device-status {
-            font-size: 12px;
-            color: #6c757d;
         }
 
         .chat-area {
@@ -352,20 +316,6 @@
             font-weight: bold;
         }
 
-        .connection-status {
-            padding: 15px;
-            background: #d4edda;
-            color: #155724;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-
-        .connection-status.disconnected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-
         .password-section {
             background: white;
             padding: 15px;
@@ -480,6 +430,7 @@
         <div class="header">
             <h1>📁 局域网文件传输</h1>
             <p>基于 WebRTC 的点对点文件传输，无需服务器</p>
+            <p style="font-size: 12px; margin-top: 10px; opacity: 0.8;">💡 跨设备连接请使用"显示连接码"功能</p>
         </div>
 
         <div class="main-content">
@@ -496,35 +447,41 @@
                             <input type="password" id="connectionPassword" class="device-input" placeholder="输入连接密码">
                         </div>
                     </div>
-                    <button class="btn btn-primary" id="startBroadcast">📡 开始广播</button>
-                    <button class="btn btn-secondary" id="stopBroadcast">⏹️ 停止广播</button>
                 </div>
 
                 <div class="sidebar-section">
-                    <h3>🔍 发现的设备</h3>
-                    <div class="device-list" id="deviceList">
-                        <p style="color: #6c757d; text-align: center; padding: 20px;">
-                            点击"开始广播"后，其他设备会出现在这里
-                        </p>
-                    </div>
-                </div>
-
-                <div class="sidebar-section">
-                    <h3>🔗 手动连接</h3>
-                    <button class="btn btn-success" id="showConnectionCode">📋 显示连接码</button>
+                    <h3>🔗 连接设备</h3>
+                    <button class="btn btn-success" id="showConnectionCode">� 生成连接码</button>
                     <button class="btn btn-primary" id="connectWithCode">🔗 输入连接码连接</button>
+                    <p style="color: #6c757d; font-size: 12px; margin-top: 10px; line-height: 1.5;">
+                        💡 <strong>使用方法：</strong><br>
+                        1. 点击"生成连接码"获取连接码<br>
+                        2. 将连接码发送给其他设备<br>
+                        3. 对方点击"输入连接码连接"<br>
+                        4. 粘贴连接码即可建立连接
+                    </p>
+                </div>
+
+                <div class="sidebar-section">
+                    <h3>� 连接状态</h3>
+                    <div id="connectionStatusSidebar" style="padding: 10px; background: #f8f9fa; border-radius: 5px; text-align: center;">
+                        <span style="color: #6c757d;">❌ 未连接</span>
+                    </div>
+                    <button class="btn btn-danger" id="disconnectBtn" style="margin-top: 10px; display: none;">断开连接</button>
                 </div>
             </div>
 
             <div class="chat-area">
-                <div class="connection-status" id="connectionStatus">
-                    ✅ 已连接到设备
-                </div>
-
                 <div class="chat-messages" id="chatMessages">
                     <div style="text-align: center; color: #6c757d; padding: 50px 20px;">
-                        <p>👋 欢迎使用局域网文件传输</p>
-                        <p style="margin-top: 10px;">设置设备名称并开始广播，然后连接到其他设备开始传输文件</p>
+                        <p>👋 欢迎使用跨设备文件传输</p>
+                        <p style="margin-top: 10px; font-size: 13px;">
+                            <strong>连接步骤：</strong><br>
+                            1. 设置设备名称（可选密码）<br>
+                            2. 点击"📋 生成连接码"获取连接码<br>
+                            3. 将连接码发送给其他设备（微信/QQ等）<br>
+                            4. 对方点击"🔗 输入连接码连接"，粘贴连接码即可
+                        </p>
                     </div>
                 </div>
 
@@ -550,7 +507,7 @@
                 <h2>📋 连接码</h2>
                 <button class="modal-close" id="closeConnectionCodeModal">&times;</button>
             </div>
-            <p style="color: #6c757d; margin-bottom: 10px;">将此连接码发送给其他设备，或扫描二维码：</p>
+            <p style="color: #6c757d; margin-bottom: 10px;">将此连接码发送给其他设备（微信、QQ等），对方粘贴后即可连接：</p>
             <div class="connection-code" id="connectionCodeDisplay"></div>
             <button class="copy-btn" id="copyConnectionCode">复制连接码</button>
         </div>
@@ -578,9 +535,6 @@
                 this.connectionPassword = '';
                 this.usePassword = false;
                 this.isInitiator = false;
-                this.broadcastChannel = null;
-                this.broadcastInterval = null;
-                this.discoveredDevices = new Map();
                 this.selectedFiles = [];
                 this.receivedFiles = new Map();
                 this.chunkSize = 16384;
@@ -603,16 +557,12 @@
                 this.passwordToggle = document.getElementById('passwordToggle');
                 this.passwordInput = document.getElementById('passwordInput');
                 this.connectionPasswordInput = document.getElementById('connectionPassword');
-                this.startBroadcastBtn = document.getElementById('startBroadcast');
-                this.stopBroadcastBtn = document.getElementById('stopBroadcast');
-                this.deviceList = document.getElementById('deviceList');
                 this.chatMessages = document.getElementById('chatMessages');
                 this.messageInput = document.getElementById('messageInput');
                 this.sendMessageBtn = document.getElementById('sendMessage');
                 this.fileUpload = document.getElementById('fileUpload');
                 this.fileInput = document.getElementById('fileInput');
                 this.selectedFilesDiv = document.getElementById('selectedFiles');
-                this.connectionStatus = document.getElementById('connectionStatus');
                 this.showConnectionCodeBtn = document.getElementById('showConnectionCode');
                 this.connectWithCodeBtn = document.getElementById('connectWithCode');
                 this.connectionCodeModal = document.getElementById('connectionCodeModal');
@@ -620,6 +570,8 @@
                 this.connectionCodeDisplay = document.getElementById('connectionCodeDisplay');
                 this.connectionCodeInput = document.getElementById('connectionCodeInput');
                 this.connectWithCodeBtn = document.getElementById('connectWithCodeBtn');
+                this.connectionStatusSidebar = document.getElementById('connectionStatusSidebar');
+                this.disconnectBtn = document.getElementById('disconnectBtn');
             }
 
             initializeEventListeners() {
@@ -627,8 +579,6 @@
                     this.passwordInput.classList.toggle('active', this.passwordToggle.checked);
                 });
 
-                this.startBroadcastBtn.addEventListener('click', () => this.startBroadcast());
-                this.stopBroadcastBtn.addEventListener('click', () => this.stopBroadcast());
                 this.sendMessageBtn.addEventListener('click', () => this.sendMessage());
                 this.messageInput.addEventListener('keypress', (e) => {
                     if (e.key === 'Enter') this.sendMessage();
@@ -655,142 +605,7 @@
                 });
                 document.getElementById('copyConnectionCode').addEventListener('click', () => this.copyConnectionCode());
                 this.connectWithCodeBtn.addEventListener('click', () => this.connectWithCode());
-            }
-
-            async startBroadcast() {
-                this.localDeviceName = this.deviceNameInput.value.trim() || `设备-${Date.now()}`;
-                this.usePassword = this.passwordToggle.checked;
-                this.connectionPassword = this.connectionPasswordInput.value;
-
-                if (this.usePassword && !this.connectionPassword) {
-                    alert('请输入连接密码');
-                    return;
-                }
-
-                this.broadcastChannel = new BroadcastChannel('p2p-file-transfer');
-                this.broadcastChannel.onmessage = (e) => this.handleBroadcastMessage(e.data);
-
-                this.broadcastInterval = setInterval(() => {
-                    this.broadcastChannel.postMessage({
-                        type: 'broadcast',
-                        deviceName: this.localDeviceName,
-                        usePassword: this.usePassword,
-                        timestamp: Date.now()
-                    });
-                }, 3000);
-
-                this.startBroadcastBtn.disabled = true;
-                this.stopBroadcastBtn.disabled = false;
-                this.deviceNameInput.disabled = true;
-
-                this.addSystemMessage(`📡 开始广播设备: ${this.localDeviceName}`);
-            }
-
-            stopBroadcast() {
-                if (this.broadcastInterval) {
-                    clearInterval(this.broadcastInterval);
-                    this.broadcastInterval = null;
-                }
-
-                if (this.broadcastChannel) {
-                    this.broadcastChannel.close();
-                    this.broadcastChannel = null;
-                }
-
-                this.discoveredDevices.clear();
-                this.updateDeviceList();
-
-                this.startBroadcastBtn.disabled = false;
-                this.stopBroadcastBtn.disabled = true;
-                this.deviceNameInput.disabled = false;
-
-                this.addSystemMessage('⏹️ 停止广播');
-            }
-
-            handleBroadcastMessage(data) {
-                if (data.type === 'broadcast' && data.deviceName !== this.localDeviceName) {
-                    const deviceId = `${data.deviceName}-${data.timestamp}`;
-                    
-                    if (!this.discoveredDevices.has(deviceId)) {
-                        this.discoveredDevices.set(deviceId, {
-                            name: data.deviceName,
-                            usePassword: data.usePassword,
-                            timestamp: data.timestamp,
-                            lastSeen: Date.now()
-                        });
-                        this.updateDeviceList();
-                    } else {
-                        this.discoveredDevices.get(deviceId).lastSeen = Date.now();
-                    }
-                }
-            }
-
-            updateDeviceList() {
-                const now = Date.now();
-                this.discoveredDevices.forEach((device, deviceId) => {
-                    if (now - device.lastSeen > 10000) {
-                        this.discoveredDevices.delete(deviceId);
-                    }
-                });
-
-                if (this.discoveredDevices.size === 0) {
-                    this.deviceList.innerHTML = `
-                        <p style="color: #6c757d; text-align: center; padding: 20px;">
-                            点击"开始广播"后，其他设备会出现在这里
-                        </p>
-                    `;
-                    return;
-                }
-
-                this.deviceList.innerHTML = '';
-                this.discoveredDevices.forEach((device, deviceId) => {
-                    const deviceItem = document.createElement('div');
-                    deviceItem.className = 'device-item';
-                    deviceItem.innerHTML = `
-                        <div class="device-name">${device.name}</div>
-                        <div class="device-status">
-                            ${device.usePassword ? '🔒 需要密码' : '🔓 无需密码'}
-                        </div>
-                    `;
-                    deviceItem.addEventListener('click', () => this.connectToDevice(device));
-                    this.deviceList.appendChild(deviceItem);
-                });
-            }
-
-            async connectToDevice(device) {
-                if (this.isConnected) {
-                    alert('已连接到设备，请先断开当前连接');
-                    return;
-                }
-
-                if (device.usePassword) {
-                    const password = prompt(`请输入 ${device.name} 的连接密码:`);
-                    if (!password) return;
-                    this.remotePassword = password;
-                }
-
-                this.remoteDeviceName = device.name;
-                this.isInitiator = true;
-
-                try {
-                    await this.createPeerConnection();
-                    this.dataChannel = this.peerConnection.createDataChannel('fileTransfer');
-                    this.setupDataChannel();
-
-                    const offer = await this.peerConnection.createOffer();
-                    await this.peerConnection.setLocalDescription(offer);
-
-                    this.addSystemMessage(`🔗 正在连接到 ${device.name}...`);
-                    this.showConnectionCode(JSON.stringify({
-                        type: 'offer',
-                        sdp: offer,
-                        deviceName: this.localDeviceName,
-                        usePassword: this.usePassword
-                    }));
-                } catch (error) {
-                    console.error('连接失败:', error);
-                    this.addSystemMessage('❌ 连接失败: ' + error.message);
-                }
+                this.disconnectBtn.addEventListener('click', () => this.disconnect());
             }
 
             async createPeerConnection() {
@@ -1106,7 +921,33 @@
                 }
             }
 
-            showConnectionCode(code) {
+            async showConnectionCode(code = null) {
+                if (!code) {
+                    this.localDeviceName = this.deviceNameInput.value.trim() || `设备-${Date.now()}`;
+                    this.usePassword = this.passwordToggle.checked;
+                    this.connectionPassword = this.connectionPasswordInput.value;
+
+                    if (this.usePassword && !this.connectionPassword) {
+                        alert('请输入连接密码');
+                        return;
+                    }
+
+                    this.isInitiator = true;
+                    await this.createPeerConnection();
+                    this.dataChannel = this.peerConnection.createDataChannel('fileTransfer');
+                    this.setupDataChannel();
+
+                    const offer = await this.peerConnection.createOffer();
+                    await this.peerConnection.setLocalDescription(offer);
+
+                    code = JSON.stringify({
+                        type: 'offer',
+                        sdp: offer,
+                        deviceName: this.localDeviceName,
+                        usePassword: this.usePassword
+                    });
+                }
+
                 this.connectionCodeDisplay.textContent = code;
                 this.connectionCodeModal.classList.add('active');
             }
@@ -1123,6 +964,15 @@
             async connectWithCode() {
                 const code = this.connectionCodeInput.value.trim();
                 if (!code) return;
+
+                this.localDeviceName = this.deviceNameInput.value.trim() || `设备-${Date.now()}`;
+                this.usePassword = this.passwordToggle.checked;
+                this.connectionPassword = this.connectionPasswordInput.value;
+
+                if (this.usePassword && !this.connectionPassword) {
+                    alert('请输入连接密码');
+                    return;
+                }
 
                 try {
                     const data = JSON.parse(code);
@@ -1160,14 +1010,27 @@
 
             updateConnectionStatus(connected) {
                 if (connected) {
-                    this.connectionStatus.textContent = `✅ 已连接到 ${this.remoteDeviceName}`;
-                    this.connectionStatus.classList.remove('disconnected');
-                    this.connectionStatus.style.display = 'block';
+                    this.connectionStatusSidebar.innerHTML = `<span style="color: #28a745;">✅ 已连接到 ${this.remoteDeviceName}</span>`;
+                    this.disconnectBtn.style.display = 'block';
                 } else {
-                    this.connectionStatus.textContent = '❌ 未连接';
-                    this.connectionStatus.classList.add('disconnected');
-                    this.connectionStatus.style.display = 'block';
+                    this.connectionStatusSidebar.innerHTML = `<span style="color: #6c757d;">❌ 未连接</span>`;
+                    this.disconnectBtn.style.display = 'none';
                 }
+            }
+
+            disconnect() {
+                if (this.dataChannel) {
+                    this.dataChannel.close();
+                    this.dataChannel = null;
+                }
+                if (this.peerConnection) {
+                    this.peerConnection.close();
+                    this.peerConnection = null;
+                }
+                this.isConnected = false;
+                this.remoteDeviceName = '';
+                this.updateConnectionStatus(false);
+                this.addSystemMessage('❌ 已断开连接');
             }
 
             formatFileSize(bytes) {
